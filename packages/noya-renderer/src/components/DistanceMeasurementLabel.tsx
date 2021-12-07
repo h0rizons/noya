@@ -8,7 +8,7 @@ import {
 import { useColorFill } from 'noya-react-canvaskit';
 import { useCanvasKit } from 'noya-renderer';
 import { round } from 'noya-utils';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTheme } from 'styled-components';
 import { Group, Rect, Text } from '..';
 import { useFontManager } from '../FontManagerContext';
@@ -20,9 +20,10 @@ const PADDING = {
 
 interface Props {
   points: [Point, Point];
+  zoom?: number;
 }
 
-export function DistanceMeasurementLabel({ points }: Props) {
+export function DistanceMeasurementLabel({ points, zoom }: Props) {
   const text = round(distance(...points)).toString();
 
   const centerPoint = useMemo(
@@ -108,13 +109,17 @@ export function DistanceMeasurementLabel({ points }: Props) {
   const backgroundFill = useColorFill(measurementColor);
 
   const transform = useMemo(() => {
+    const affinity = zoom
+      ? AffineTransform.translate(20, 20).scale(1 / zoom, 1 / zoom)
+      : AffineTransform.identity;
+
     switch (orientation) {
       case 'vertical':
-        return AffineTransform.translate(6, -backgroundSize.height / 2);
+        return affinity.translate(6, -backgroundSize.height / 2);
       case 'horizontal':
-        return AffineTransform.translate(-backgroundSize.width / 2, 6);
+        return affinity.translate(-backgroundSize.width / 2, 6);
     }
-  }, [backgroundSize, orientation]);
+  }, [backgroundSize, orientation, zoom]);
 
   return (
     <Group transform={transform}>

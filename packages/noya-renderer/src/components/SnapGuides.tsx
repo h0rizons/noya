@@ -51,6 +51,10 @@ const SnapGuidesAxis = memo(function SnapGuidesAxis({
   showLabels,
 }: Props) {
   const sourceValues = getSnapValues(sourceRect, axis);
+  const [state] = useApplicationState();
+  const interactionState = state.interactionState;
+
+  const zoom = useZoom();
 
   const snaps = targetLayers
     .flatMap((targetLayer) =>
@@ -122,17 +126,21 @@ const SnapGuidesAxis = memo(function SnapGuidesAxis({
     },
   );
 
+  if (interactionState.type !== 'moving' && interactionState.type !== 'scaling')
+    return null;
+
   return (
     <>
       {alignmentGuides.map((points, index) => (
-        <AlignmentGuide key={index} points={points} />
+        <AlignmentGuide key={index} points={points} zoom={zoom} />
       ))}
       {guides.map((guide, index) => (
         <Fragment key={index}>
-          <ExtensionGuide points={guide.extension} />
-          <MeasurementGuide points={guide.measurement} />
+          <ExtensionGuide points={guide.extension} zoom={zoom} />
+          <MeasurementGuide points={guide.measurement} zoom={zoom} />
+
           {showLabels && (
-            <DistanceMeasurementLabel points={guide.measurement} />
+            <DistanceMeasurementLabel points={guide.measurement} zoom={zoom} />
           )}
         </Fragment>
       ))}
@@ -258,12 +266,9 @@ export default memo(function SnapGuides() {
           .translate(20, 20)}
       >
         <AreaMeasurementLabel
-          text={`${round(areaSize.width, 2)} × ${round(areaSize.height, 2)}`}
+          text={`${round(areaSize.width)} × ${round(areaSize.height)}`}
           fontSize={14}
-          padding={{
-            width: 8,
-            height: 4,
-          }}
+          padding={{ width: 8, height: 4 }}
         />
       </Group>
     );

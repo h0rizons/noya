@@ -19,18 +19,21 @@ function Guide({ points, paint }: GuideProps) {
 
 interface Props {
   points: [Point, Point];
+  zoom?: number;
 }
 
-export function AlignmentGuide({ points }: Props) {
+export function AlignmentGuide({ points, zoom }: Props) {
   const primaryColor = useTheme().colors.primary;
   const paint = useStroke({ color: primaryColor });
+  if (zoom) paint.setStrokeWidth(2 / zoom);
 
   return <Guide paint={paint} points={points} />;
 }
 
-export function MeasurementGuide({ points }: Props) {
+export function MeasurementGuide({ points, zoom }: Props) {
   const measurementColor = useTheme().colors.canvas.measurement;
   const paint = useStroke({ color: measurementColor });
+  if (zoom) paint.setStrokeWidth(2 / zoom);
 
   return <Guide paint={paint} points={points} />;
 }
